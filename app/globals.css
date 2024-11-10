@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+:root {
+  --background: #F5F5F5;
+  --foreground: #000;
+  --brown: #3C2101;
+  --wind: "#c4e6ea";
+  --pine: "#045D1D";
+  --seedling: "#4FE309";
+  --solar: "#eee935";
+  --ash: "#45524f";
+  --leaf: "#20ba20";
+  --font-main: "Raleway", sans-serif;
+  --font-sans: "Roboto", sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: var(--font-sans);
+}
+

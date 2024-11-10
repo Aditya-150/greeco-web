@@ -1,0 +1,70 @@
+[debug] [2024-11-10T05:28:12.629Z] ----------------------------------------------------------------------
+[debug] [2024-11-10T05:28:12.632Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\bishn\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2024-11-10T05:28:12.632Z] CLI Version:   13.24.2
+[debug] [2024-11-10T05:28:12.632Z] Platform:      win32
+[debug] [2024-11-10T05:28:12.632Z] Node Version:  v20.13.1
+[debug] [2024-11-10T05:28:12.633Z] Time:          Sun Nov 10 2024 10:58:12 GMT+0530 (India Standard Time)
+[debug] [2024-11-10T05:28:12.633Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-11-10T05:28:12.702Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-11-10T05:28:12.702Z] > authorizing via signed-in user (adiityacreates@gmail.com)
+[debug] [2024-11-10T05:28:12.702Z] [iam] checking project greecomart for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-11-10T05:28:12.703Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:12.703Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:12.704Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/greecomart:testIamPermissions [none]
+[debug] [2024-11-10T05:28:12.704Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/greecomart:testIamPermissions x-goog-quota-user=projects/greecomart
+[debug] [2024-11-10T05:28:12.705Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/greecomart:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-11-10T05:28:14.417Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/greecomart:testIamPermissions 200
+[debug] [2024-11-10T05:28:14.417Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/greecomart:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-11-10T05:28:14.418Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:14.419Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:14.419Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/greecomart [none]
+[debug] [2024-11-10T05:28:15.006Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/greecomart 200
+[debug] [2024-11-10T05:28:15.006Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/greecomart {"projectId":"greecomart","projectNumber":"937923522662","displayName":"greecomart","name":"projects/greecomart","resources":{"hostingSite":"greecomart"},"state":"ACTIVE","etag":"1_759d8027-c341-4c51-80d5-1c109c381f4f"}
+[debug] [2024-11-10T05:28:21.710Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:21.711Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:21.712Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites pageToken=&pageSize=10
+[debug] [2024-11-10T05:28:23.006Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites 200
+[debug] [2024-11-10T05:28:23.006Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites {"sites":[{"name":"projects/greecomart/sites/greecomart","defaultUrl":"https://greecomart.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2024-11-10T05:28:23.007Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:23.007Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:23.007Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites 
+[debug] [2024-11-10T05:28:23.525Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites 200
+[debug] [2024-11-10T05:28:23.525Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites {"sites":[{"name":"projects/greecomart/sites/greecomart","defaultUrl":"https://greecomart.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2024-11-10T05:28:23.525Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:23.525Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:23.525Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/greecomart/webApps/-/config [none]
+[debug] [2024-11-10T05:28:24.632Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/greecomart/webApps/-/config 200
+[debug] [2024-11-10T05:28:24.632Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/greecomart/webApps/-/config {"projectId":"greecomart","storageBucket":"greecomart.firebasestorage.app","apiKey":"AIzaSyBMOUGewQfdZ2EMdhPPqFE8rFTpjl3M96A","authDomain":"greecomart.firebaseapp.com","messagingSenderId":"937923522662"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2024-11-10T05:28:38.765Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:38.765Z] Checked if tokens are valid: true, expires at: 1731219735824
+[debug] [2024-11-10T05:28:38.765Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites/greecomart [none]
+[debug] [2024-11-10T05:28:39.928Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites/greecomart 200
+[debug] [2024-11-10T05:28:39.928Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/greecomart/sites/greecomart {"name":"projects/greecomart/sites/greecomart","defaultUrl":"https://greecomart.web.app","type":"DEFAULT_SITE"}
+[info]    ▲ Next.js 15.0.3
+
+[info]    - Environments: .env
+
+
+[info]    Creating an optimized production build ...
+
+[info] uncaughtException [Error: EPERM: operation not permitted, open 'C:\Users\bishn\Desktop\greeco-web\.next\trace'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'C:\\Users\\bishn\\Desktop\\greeco-web\\.next\\trace'
+}
+
+[debug] [2024-11-10T05:28:54.706Z] Error: ENOENT: no such file or directory, open 'C:\Users\bishn\Desktop\greeco-web\.next\server\middleware-manifest.json'
+[error] 
+[error] Error: An unexpected error has occurred.
