@@ -7,7 +7,10 @@ export default function Hero() {
   return (
     <div>
       <motion.div>Hero</motion.div>
-      <img alt="hero image" src="/header_image.webp" />
+      <div>
+        <img alt="hero image" src="/header_image.webp" />
+        <img alt="hero image" src="/Header_pattern.webp" />
+      </div>
     </div>
   );
 }
