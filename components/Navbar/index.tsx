@@ -30,7 +30,7 @@ export default function Navbar() {
           <Link href="/#products">PRODUCTS</Link>
         </div>
 
-        <button className="hidden sm:block rounded-full border border-black bg-transparent text-black py-2 px-4">
+        <button className="hidden sm:block rounded-full border border-black bg-transparent hover:bg-black hover:text-white transition-all duration-300 ease-in-out  text-black py-2 px-4">
           Request a Quote
         </button>
 
