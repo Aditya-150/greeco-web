@@ -66,7 +66,7 @@ export default function Hero() {
             </span>
           </button>
         </div>
-        <div className="relative 2xl:scale-105 hidden lg:block">
+        <div className="relative 2xl:scale-105 hidden xl:block">
           <motion.img
             alt="hero image"
             src="/header_image.webp"
