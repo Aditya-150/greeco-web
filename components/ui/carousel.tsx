@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
-// Define interface for carousel props
 interface CarouselProps {
   items: Array<{ id: number; src: string; name: string }>;
   showDots?: boolean;
@@ -18,7 +18,7 @@ interface CarouselProps {
   continuous?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
-  infinite?: boolean; // New prop to enable infinite looping
+  infinite?: boolean;
 }
 
 const Carousel = ({
@@ -34,25 +34,41 @@ const Carousel = ({
   continuous = false,
   autoPlay = false,
   autoPlayInterval = 3000,
-  infinite = false, // default is false
+  infinite = false,
 }: CarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(infinite ? 1 : 0); // Start at 1 for seamless infinite scroll
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [itemsPerViewCount, setItemsPerViewCount] = useState(
     itemsPerView.default
   );
 
-  // Ensure the component is mounted before rendering
+  const cloneItems = useCallback(() => {
+    if (!infinite) return items;
+    const beforeItems = items.slice(-itemsPerViewCount);
+    const afterItems = items.slice(0, itemsPerViewCount);
+
+    return [
+      ...beforeItems.map((item) => ({ ...item, id: `before-${item.id}` })),
+      ...items,
+      ...afterItems.map((item) => ({ ...item, id: `after-${item.id}` })),
+    ];
+  }, [items, infinite, itemsPerViewCount]);
+
+  const [extendedItems, setExtendedItems] = useState(cloneItems());
+
+  useEffect(() => {
+    setExtendedItems(cloneItems());
+  }, [cloneItems, itemsPerViewCount]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Calculate items per view based on screen size
   useEffect(() => {
     const calculateItemsPerView = () => {
       if (typeof window === "undefined") return itemsPerView.default;
-
       const width = window.innerWidth;
       if (width >= 1024 && itemsPerView.lg) return itemsPerView.lg;
       if (width >= 768 && itemsPerView.md) return itemsPerView.md;
@@ -60,10 +76,8 @@ const Carousel = ({
       return itemsPerView.default;
     };
 
-    // Set the initial itemsPerView count
     setItemsPerViewCount(calculateItemsPerView());
 
-    // Handle window resize to adjust itemsPerView dynamically
     const handleResize = () => {
       setItemsPerViewCount(calculateItemsPerView());
     };
@@ -72,13 +86,43 @@ const Carousel = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [itemsPerView]);
 
-  // Create duplicate items for infinite scrolling
-  const extendedItems = infinite
-    ? [items[items.length - 1], ...items, items[0]] // Duplicate first and last items
-    : items;
+  const handleInfiniteScroll = useCallback(
+    (newIndex: number) => {
+      if (!infinite) return newIndex;
 
-  // Calculate total slides needed based on items per view
-  const totalSlides = Math.ceil(items.length / itemsPerViewCount);
+      setIsTransitioning(true);
+
+      if (newIndex >= items.length + itemsPerViewCount) {
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setCurrentIndex(itemsPerViewCount);
+        }, 300);
+        return items.length + itemsPerViewCount - 1;
+      }
+
+      if (newIndex < itemsPerViewCount) {
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setCurrentIndex(items.length);
+        }, 300);
+        return 0;
+      }
+
+      setIsTransitioning(false);
+      return newIndex;
+    },
+    [infinite, items.length, itemsPerViewCount]
+  );
+
+  const paginate = (newDirection: number) => {
+    if (isTransitioning) return;
+
+    setDirection(newDirection);
+    setCurrentIndex((prevIndex) => {
+      const newIndex = prevIndex + newDirection;
+      return handleInfiniteScroll(newIndex);
+    });
+  };
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -97,58 +141,27 @@ const Carousel = ({
     }),
   };
 
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
-
-  const paginate = (newDirection: number) => {
-    setDirection(newDirection);
-    setCurrentIndex((prevIndex) => {
-      let newIndex = prevIndex + newDirection;
-
-      if (infinite) {
-        if (newIndex === 0) {
-          setTimeout(() => setCurrentIndex(totalSlides), 300); // Jump to the last real item
-          return totalSlides - 1; // Show the duplicate end item momentarily
-        }
-        if (newIndex >= totalSlides + 1) {
-          setTimeout(() => setCurrentIndex(1), 300); // Jump to the first real item
-          return 1; // Show the duplicate start item momentarily
-        }
-      } else {
-        if (newIndex >= totalSlides) newIndex = 0;
-        if (newIndex < 0) newIndex = totalSlides - 1;
-      }
-
-      return newIndex;
-    });
-  };
-
-  // Get visible items for current slide
   const getVisibleItems = () => {
-    const startIndex = currentIndex * itemsPerViewCount;
+    const startIndex = currentIndex;
     return extendedItems.slice(startIndex, startIndex + itemsPerViewCount);
   };
 
-  // Auto play functionality
   useEffect(() => {
-    if (!autoPlay) return;
+    if (!autoPlay || isTransitioning) return;
 
     const interval = setInterval(() => {
       paginate(1);
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [currentIndex, autoPlay, autoPlayInterval]);
+  }, [currentIndex, autoPlay, autoPlayInterval, isTransitioning]);
 
-  // If the component isn't mounted, don't render anything to avoid hydration issues
   if (!mounted) return null;
 
   return (
     <div className="relative w-full max-w-6xl mx-auto px-4">
       <div
-        className={`relative h-64 overflow-hidden rounded-lg ${
+        className={`relative h-64 ${
           continuous ? "overflow-visible" : "overflow-hidden"
         }`}
       >
@@ -164,31 +177,17 @@ const Carousel = ({
               x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={1}
-            onDragEnd={(e, { offset, velocity }) => {
-              const swipe = swipePower(offset.x, velocity.x);
-              if (swipe < -swipeConfidenceThreshold) {
-                paginate(1);
-              } else if (swipe > swipeConfidenceThreshold) {
-                paginate(-1);
-              }
-            }}
             className="absolute w-full h-full flex"
             style={{ gap: `${gap}px` }}
           >
             {getVisibleItems().map((image) => (
               <div
                 key={image.id}
-                className={`relative ${
-                  continuous
-                    ? "flex-shrink-0 w-[calc(100%/var(--items-per-view)-var(--gap))]"
-                    : `flex-1`
-                }`}
+                className="relative flex-shrink-0 text-center"
                 style={{
-                  width: `calc(100% / ${itemsPerViewCount} - ${gap}px)`,
-                  gap: `${gap}px`,
+                  width: `calc((100% - ${
+                    gap * (itemsPerViewCount - 1)
+                  }px) / ${itemsPerViewCount})`,
                 }}
               >
                 <img
@@ -196,38 +195,46 @@ const Carousel = ({
                   alt={image.name}
                   className="w-full h-full object-cover rounded-lg"
                 />
+                <div className="image-name inline-block bg-brown text-white py-1 px-2 rounded-full mt-4">
+                  <p>{image.name}</p>
+                </div>
               </div>
             ))}
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="flex justify-center gap-4 mt-4">
+      <div className="flex justify-center gap-4 mt-16">
         <button
           onClick={() => paginate(-1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="p-2 aspect-square g-transparent border border-gray-800 rounded-full"
+          disabled={isTransitioning}
         >
-          Previous
+          <ArrowLeft />
         </button>
         <button
           onClick={() => paginate(1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="p-2 aspect-square bg-transparent border border-gray-800 rounded-full"
+          disabled={isTransitioning}
         >
-          Next
+          <ArrowRight />
         </button>
       </div>
 
       {showDots && (
         <div className="flex justify-center gap-2 mt-4">
-          {Array.from({ length: totalSlides }).map((_, index) => (
+          {Array.from({ length: items.length }).map((_, index) => (
             <button
               key={index}
               onClick={() => {
+                if (isTransitioning) return;
                 setDirection(index > currentIndex ? 1 : -1);
-                setCurrentIndex(index);
+                setCurrentIndex(index + itemsPerViewCount);
               }}
               className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? "bg-blue-500" : "bg-gray-300"
+                index + itemsPerViewCount === currentIndex
+                  ? "bg-blue-500"
+                  : "bg-gray-300"
               }`}
             />
           ))}

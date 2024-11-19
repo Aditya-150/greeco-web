@@ -26,7 +26,7 @@ export default function Products() {
           </div>
         ))}
       </div>
-      <div className="xl:hidden flex">
+      <div className="xl:hidden flex overflow-hidden">
         <Carousel items={Products} continuous={true} infinite={true} showDots={false}/>
       </div>
     </div>
