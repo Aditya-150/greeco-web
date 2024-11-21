@@ -10,7 +10,7 @@ export default function Navbar() {
   return (
     <div className="fixed top-5 left-0 right-0 z-50">
       {/* Main Navbar */}
-      <div className="sm:max-w-7xl max-w-sm rounded-full mx-auto px-4 sm:px-6 sm:py-6 py-4 bg-white w-full flex justify-between items-center shadow-lg">
+      <div className="sm:max-w-2xl lg:max-w-7xl  max-w-sm rounded-full mx-auto px-4 sm:px-6 sm:py-6 py-4 bg-white w-full flex justify-between items-center shadow-lg">
         <div className="z-50">
           <img
             alt="logo"
