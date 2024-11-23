@@ -30,7 +30,7 @@ export default function Services() {
             <span className="h-1 w-16 bg-[#4FE309]"></span>
             <h1 className="text-2xl font-semibold">Why Us?</h1>
           </div>
-          <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4 mt-8">
+          <div className="grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4 mt-8">
             {services.map((service) => (
               <div
                 className="bg-white p-4 rounded-xl aspect-square flex flex-col justify-center items-center"
