@@ -1,14 +1,33 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-
-import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
-const contactDetails = [
+interface ContactDetail {
+  id: number;
+  icon: string;
+  link: string;
+  text: string;
+  name: string;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  type: string;
+  company: string;
+  message: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  type?: string;
+  message?: string;
+}
+
+const contactDetails: ContactDetail[] = [
   {
     id: 1,
     icon: "/mail-icon.svg",
@@ -25,50 +44,113 @@ const contactDetails = [
   },
 ];
 
-// Zod schema for validation
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  type: z.string().min(1, "Please specify Buyer or Seller"),
-  company: z.string().optional(),
-  message: z.string().min(1, "Message is required"),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-export default function Contact() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+const Contact: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    type: "",
+    company: "",
+    message: "",
   });
-
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
     null
   );
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Replace with your Google Apps Script URL
-  const googleScriptURL =
-    "https://script.google.com/macros/s/AKfycbwFGEcPmE1aTOD7rHFE_jqM2jmYxWtpsv99ST8b7PpWF8QvMbezx9E67oiIImkzwrXkEw/exec";
+  const validateForm = (): FormErrors => {
+    const newErrors: FormErrors = {};
+    if (!formData.name) newErrors.name = "Name is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email address";
+    if (!formData.type) newErrors.type = "Please specify Buyer or Seller";
+    if (!formData.message) newErrors.message = "Message is required";
+    return newErrors;
+  };
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitStatus(null);
+    setErrorMessage("");
+
+    // Validate form
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
     try {
-      const response = await fetch(googleScriptURL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Create URL-encoded string manually
+      const formBody = Object.entries(formData)
+        .map(
+          ([key, value]) =>
+            encodeURIComponent(key) + "=" + encodeURIComponent(value)
+        )
+        .join("&");
 
-      if (!response.ok) throw new Error("Failed to submit form");
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbzI5Oxsc3UBPlMysl01ziWtj-rzdeC808yjQQUB8F8lYe7MW4K_JfC_TK73YEyck02H/exec", // Replace with your actual URL
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: formBody,
+        }
+      );
+
+
+      if (response.ok) {
+        setFormData({
+          name: "",
+          email: "",
+          type: "",
+          company: "",
+          message: "",
+        });
+        setSubmitStatus("success");
+      } else {
+        const errorData = await response.json();
+        setSubmitStatus("error");
+        setErrorMessage(
+          errorData.error || "Failed to submit the form. Please try again."
+        );
+      }
+
+
+      // Reset form and show success message
+      setFormData({
+        name: "",
+        email: "",
+        type: "",
+        company: "",
+        message: "",
+      });
       setSubmitStatus("success");
-      reset();
-    } catch {
+    } catch (error) {
+      console.log("Error submitting form:", error);
       setSubmitStatus("error");
+      setErrorMessage(
+        "Failed to submit the form. Please try again or contact us directly."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -102,83 +184,92 @@ export default function Contact() {
               ))}
             </div>
           </div>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
             <div className="bg-brown p-6 rounded-2xl grid grid-cols-2 gap-4">
               <div className="col-span-1 flex flex-col">
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   placeholder="Full Name"
                   className="bg-slate-100 text-base placeholder:text-gray-500 p-2 rounded-lg"
-                  {...register("name")}
+                  aria-label="Full Name"
                 />
-                <p className="col-span-2 text-red-500">
-                  {errors.name?.message}
-                </p>
+                {errors.name && <p className="text-red-500">{errors.name}</p>}
               </div>
 
               <div className="col-span-1 flex flex-col">
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="Email"
                   className="bg-slate-100 text-base placeholder:text-gray-500 p-2 rounded-lg"
-                  {...register("email")}
+                  aria-label="Email"
                 />
-                <p className="col-span-2 text-red-500">
-                  {errors.email?.message}
-                </p>
+                {errors.email && <p className="text-red-500">{errors.email}</p>}
               </div>
 
               <div className="col-span-1 flex flex-col">
                 <input
                   type="text"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
                   placeholder="Buyer/Seller"
                   className="bg-slate-100 text-base placeholder:text-gray-500 p-2 rounded-lg"
-                  {...register("type")}
+                  aria-label="Buyer/Seller"
                 />
-                <p className="col-span-2 text-red-500">
-                  {errors.type?.message}
-                </p>
+                {errors.type && <p className="text-red-500">{errors.type}</p>}
               </div>
+
               <div className="col-span-1 flex flex-col">
                 <input
                   type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleInputChange}
                   placeholder="Company Name"
                   className="bg-slate-100 text-base placeholder:text-gray-500 p-2 rounded-lg"
-                  {...register("company")}
+                  aria-label="Company Name"
                 />
               </div>
 
               <div className="col-span-2 flex flex-col">
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
                   placeholder="Message"
                   className="bg-slate-100 text-base placeholder:text-gray-500 p-2 w-full rounded-lg h-48 lg:h-72 resize-none"
-                  {...register("message")}
+                  aria-label="Message"
                 />
-                <p className="text-red-500 w-full">{errors.message?.message}</p>
+                {errors.message && (
+                  <p className="text-red-500">{errors.message}</p>
+                )}
               </div>
             </div>
+
             <button
               type="submit"
-              className="px-32 py-2 border border-black bg-white font-medium rounded-full inline-flex items-center gap-x-2 self-center group hover:bg-brown hover:text-white transition-all duration-300 ease-in-out"
               disabled={isSubmitting}
+              className="px-32 py-2 border border-black bg-white font-medium rounded-full inline-flex items-center gap-x-2 self-center group hover:bg-brown hover:text-white transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
               <span className="bg-brown rounded-full p-1">
                 <ArrowRightIcon color="white" className="size-4" />
               </span>
             </button>
+
             {submitStatus === "success" && (
               <p className="text-green-500 text-center mt-2">
-                Form submitted successfully!
+                Form submitted successfully! We&apos;ll get back to you soon.
               </p>
             )}
             {submitStatus === "error" && (
-              <p className="text-red-500 text-center mt-2">
-                Failed to submit the form. Please try again.
-              </p>
+              <p className="text-red-500 text-center mt-2">{errorMessage}</p>
             )}
           </form>
         </div>
@@ -193,4 +284,6 @@ export default function Contact() {
       </div>
     </div>
   );
-}
+};
+
+export default Contact;
