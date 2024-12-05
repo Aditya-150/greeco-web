@@ -96,27 +96,25 @@ const Contact: React.FC = () => {
     setErrors({});
 
     try {
-      // Create URL-encoded string manually
-      const formBody = Object.entries(formData)
-        .map(
-          ([key, value]) =>
-            encodeURIComponent(key) + "=" + encodeURIComponent(value)
-        )
-        .join("&");
+      // Use FormData for more reliable form submission
+      const formDataObj = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataObj.append(key, value);
+      });
 
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbzI5Oxsc3UBPlMysl01ziWtj-rzdeC808yjQQUB8F8lYe7MW4K_JfC_TK73YEyck02H/exec", // Replace with your actual URL
+        "https://script.google.com/macros/s/AKfycbwCT1v8dulLgAsIRaHOYVH2UWQBwk-zwNDjjFdfbIfid8Y74e6aFIhqHmzNWAR07y9J4g/exec",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formBody,
+          body: formDataObj,
+          mode: "no-cors", // Important for cross-origin requests
         }
       );
 
-
-      if (response.ok) {
+      // Since it's no-cors, we'll check network status
+      // Note: With no-cors, you can't read the actual response
+      if (response.type === "opaque") {
+        // Successful submission in no-cors mode
         setFormData({
           name: "",
           email: "",
@@ -126,25 +124,11 @@ const Contact: React.FC = () => {
         });
         setSubmitStatus("success");
       } else {
-        const errorData = await response.json();
-        setSubmitStatus("error");
-        setErrorMessage(
-          errorData.error || "Failed to submit the form. Please try again."
-        );
+        // Fallback error handling
+        throw new Error("Submission failed");
       }
-
-
-      // Reset form and show success message
-      setFormData({
-        name: "",
-        email: "",
-        type: "",
-        company: "",
-        message: "",
-      });
-      setSubmitStatus("success");
     } catch (error) {
-      console.log("Error submitting form:", error);
+      console.error("Error submitting form:", error);
       setSubmitStatus("error");
       setErrorMessage(
         "Failed to submit the form. Please try again or contact us directly."
