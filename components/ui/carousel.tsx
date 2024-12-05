@@ -161,7 +161,7 @@ const Carousel = ({
   return (
     <div className="relative w-full max-w-6xl mx-auto px-4">
       <div
-        className={`relative h-64 ${
+        className={`relative h-96 ${
           continuous ? "overflow-visible" : "overflow-hidden"
         }`}
       >

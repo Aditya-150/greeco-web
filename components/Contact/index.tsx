@@ -31,15 +31,15 @@ const contactDetails: ContactDetail[] = [
   {
     id: 1,
     icon: "/mail-icon.svg",
-    link: "mailto:info@greecomart.com",
-    text: "info@greecomart.com",
+    link: "mailto:founders@greecomart.com",
+    text: "founders@greecomart.com",
     name: "Mail",
   },
   {
     id: 2,
     icon: "/call-icon.svg",
-    link: "tel:+919368794828",
-    text: "+91 9368794828",
+    link: "tel:+919720623941",
+    text: "+91 9720623941",
     name: "Call",
   },
 ];
